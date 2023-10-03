@@ -4,9 +4,16 @@ import 'package:tonyyaooo/screens/auth/login/view/login_screen.dart';
 import 'package:tonyyaooo/utils/text_styles/text_styles.dart';
 import 'package:tonyyaooo/utils/theme/theme_data.dart';
 import 'bindings/initializing_dependency.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'service/firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Scaffold(
       body: Container(

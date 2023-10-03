@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:tonyyaooo/models/discussion_model/discussion_model.dart';
 
 import '../../generated/assets.dart';
@@ -8,6 +10,7 @@ import '../../models/stocks_model/stocks_model.dart';
 
 class ConstantLists {
   ConstantLists._();
+  static var loaded = false;
 
   static List<BottomNavigationBarModel> bottomBarList = [
     BottomNavigationBarModel(
@@ -31,6 +34,7 @@ class ConstantLists {
       title: "Notification",
     ),
   ];
+
   static List<StocksModel> stocksModelList = [
     StocksModel(
       companyImage: Assets.forecastImageTeslaIcon,
@@ -44,7 +48,7 @@ class ConstantLists {
       pricePercentageRaise: "+5.94%",
       predictionPercentagePrice: "+2.3%",
       aiSuggestionAndAnalysis:
-          "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
+      "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
     ),
     StocksModel(
       companyImage: Assets.forecastImageMetaIcon,
@@ -58,17 +62,31 @@ class ConstantLists {
       pricePercentageRaise: "+5.94%",
       predictionPercentagePrice: "+2.3%",
       aiSuggestionAndAnalysis:
-          "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
+      "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
     ),
+    StocksModel(
+      companyImage: Assets.forecastImageMetaIcon,
+      companyName: "META",
+      corporateName: "Meta, Inc",
+      publicOpinion: "Neutral",
+      price: "343.43",
+      publicAttention: "1523.3",
+      publicPercentageAttention: "+233.3%",
+      predictionPrice: "333.2",
+      pricePercentageRaise: "+5.94%",
+      predictionPercentagePrice: "+2.3%",
+      aiSuggestionAndAnalysis:
+      "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
+    )
   ];
   static List<ForecastModel> forecastModelList = [
     ForecastModel(
       typeOfForecast: "News",
       dateOfForecast: "Aug.28 2023",
       forecastTitle:
-          "Elon Musk vs Mark Zukerberg fight will be streamed on X, according to Musk",
+      "Elon Musk vs Mark Zukerberg fight will be streamed on X, according to Musk",
       forecastDescription:
-          "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
+      "Lorem ipsum dolor sit amet consectetur. Viverra morbi tempus tristique ut odio est massa iaculis. Neque nibh cursus mi ipsum enim. Pellentesque in in vulputate cras purus lectus ut. Sapien facilisi amet magna facilisi sapien. Nisl rutrum sapien gravida consequat aliquam vitae diam fringilla ipsum. Ornare tellus nullam nunc rhoncus fames. Ut nec nisi ut dictum consequat at posuere in.",
       forecastImage: Assets.forecastImageForecastModelImage,
       forecastDetailImage: Assets.forecastImageStockDetailImage,
       realtimeDataModel: RealtimeDataModel(
@@ -95,18 +113,26 @@ class ConstantLists {
       ],
     ),
   ];
-  static List<DiscussionModel> discussionModelList = [
-    DiscussionModel(
-      discussionPostedByImage: Assets.notificationImagesNitificationImageOne,
-      discussionPostedByName: "Leo Press",
-      postedTimeAgo: "About 1 minute ago",
-      postDescription: "Lorem ipsum dolor sit amet",
-      postImage: Assets.discussionImagesDiscussionImage,
-      noOfLikes: 12,
-      noOfComments: 20,
-      numbersOfShares: 20,
-    ),
-  ];
+
+  static List<DiscussionModel> discussionModelList = [];
+
+  static getDiscussions() async {
+    var db = FirebaseFirestore.instance;
+    await db.collection("posts").get().then(
+          (querySnapshot) {
+        print("Successfully completed");
+        for (var docSnapshot in querySnapshot.docs) {
+          var image = null;
+          if (docSnapshot.get("imageURL")!=null){
+            image = docSnapshot.get("imageURL");
+          }
+          discussionModelList.add(DiscussionModel(documentID: docSnapshot.id, discussionPostedByImage: Assets.notificationImagesNitificationImageOne, discussionPostedByName: docSnapshot.get("sender"), postedTimeAgo: docSnapshot.get("time"), postDescription: docSnapshot.get("body"), postImage: image, noOfLikes: docSnapshot.get("likeNumber"), noOfComments: docSnapshot.get("commentNumber"), numbersOfShares: docSnapshot.get("shareNumber")));
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+  }
+
   static List<NotificationModel> notificationModelList = [
     NotificationModel(
       imageAsset: Assets.notificationImagesNitificationImageOne,

@@ -1,5 +1,6 @@
 class DiscussionModel {
-  String discussionPostedByImage,
+  String documentID,
+      discussionPostedByImage,
       discussionPostedByName,
       postedTimeAgo,
       postDescription,
@@ -7,6 +8,7 @@ class DiscussionModel {
   int noOfLikes, noOfComments, numbersOfShares;
 
   DiscussionModel({
+    required this.documentID,
     required this.discussionPostedByImage,
     required this.discussionPostedByName,
     required this.postedTimeAgo,

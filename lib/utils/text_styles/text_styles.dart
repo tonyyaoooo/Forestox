@@ -187,19 +187,19 @@ class CustomTextStyles {
   );
   static const TextStyle darkColorTwo508 = TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 8,
+    fontSize: 10,
     color: CColors.darkColorTwo,
     fontFamily: "Poppins",
   );
   static const TextStyle red508 = TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 8,
+    fontSize: 10,
     color: CColors.redColor,
     fontFamily: "Poppins",
   );
   static const TextStyle green508 = TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 8,
+    fontSize: 10,
     color: CColors.greenColor,
     fontFamily: "Poppins",
   );

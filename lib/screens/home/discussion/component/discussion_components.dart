@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tonyyaooo/generated/assets.dart';
 import 'package:tonyyaooo/models/discussion_model/discussion_model.dart';
+import 'package:tonyyaooo/utils/constants/constant_lists.dart';
 import 'package:tonyyaooo/utils/gaps/gaps.dart';
 
 import '../../../../utils/text_styles/text_styles.dart';
@@ -14,8 +16,16 @@ class DiscussionPostComponent extends StatelessWidget {
     required this.discussionModel,
   });
 
+   getImage(url){
+    if (url!="Null"){
+      return Image.network(url);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var db = FirebaseFirestore.instance;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,10 +62,13 @@ class DiscussionPostComponent extends StatelessWidget {
         10.ph,
         Text(
           discussionModel.postDescription,
-          style: CustomTextStyles.black413,
+          style: CustomTextStyles.black415,
         ),
         10.ph,
-        Image.asset(discussionModel.postImage),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: getImage(discussionModel.postImage),
+        ),
         10.ph,
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -64,7 +77,14 @@ class DiscussionPostComponent extends StatelessWidget {
             PostActionComponent(
               iconString: Assets.appIconsHeartIcon,
               number: discussionModel.noOfLikes,
-              onTapFunction: () {},
+
+              onTapFunction: () {
+                print("like");
+                var post = db.collection('posts').doc(discussionModel.documentID);
+                post.update(
+                  {"likeNumber": FieldValue.increment(1)},
+                );
+              },
             ),
             PostActionComponent(
               iconString: Assets.appIconsCommentsIcon,
@@ -109,6 +129,8 @@ class PostActionComponent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         IconButton(
+          color: Colors.red,
+          isSelected: true,
           onPressed: onTapFunction,
           icon: SvgPicture.asset(
             iconString,

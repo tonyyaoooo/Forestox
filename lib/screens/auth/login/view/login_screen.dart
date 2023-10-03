@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tonyyaooo/generated/assets.dart';
 import 'package:tonyyaooo/reusable_widgets/buttons/custom_elevated_button.dart';
 import 'package:tonyyaooo/utils/alignment/widget_alignment.dart';
 import 'package:tonyyaooo/utils/gaps/gaps.dart';
 import 'package:tonyyaooo/utils/text_styles/text_styles.dart';
 
+import '../../../../service/authentication.dart';
 import '../../../../reusable_widgets/text_field/auth_form_field.dart';
 import '../../../../utils/colors/app_colors.dart';
 import '../../../home/stocks/stocks_landing/view/stocks_landing_screen.dart';
 import '../controller/login_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class LogInScreen extends StatelessWidget {
   const LogInScreen({super.key});
@@ -18,6 +22,20 @@ class LogInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final logInController = Get.find<LogInController>();
+   FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+        Get.off(
+              () => const StocksLandingScreen(),
+          transition: Transition.fadeIn,
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: CColors.whiteColor,
       resizeToAvoidBottomInset: false,
@@ -96,10 +114,25 @@ class LogInScreen extends StatelessWidget {
                           30.ph,
                           CustomElevatedButton(
                             onPressedFunction: () {
-                              Get.off(
-                                () => const StocksLandingScreen(),
-                                transition: Transition.fadeIn,
-                              );
+                              print(logInController.emailController.text);
+                              AuthenticationHelper()
+                                  .signIn(email: logInController.emailController.text, password: logInController.passwordController.text)
+                                  .then((result) {
+                                if (result == null) {
+                                  Get.off(
+                                        () => const StocksLandingScreen(),
+                                    transition: Transition.fadeIn,
+                                  );
+                                }
+                                else {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                      result,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ));
+                                }
+                              });
                             },
                             buttonText: "Login",
                             width: context.width * 1,
@@ -117,7 +150,9 @@ class LogInScreen extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: CustomElevatedButton(
-                                  onPressedFunction: () {},
+                                  onPressedFunction: () {
+                                    signInWithGoogle();
+                                  },
                                   width: context.width * 1,
                                   isSocialMediaButton: true,
                                   isGoogleLogIn: true,
@@ -126,7 +161,10 @@ class LogInScreen extends StatelessWidget {
                               20.pw,
                               Expanded(
                                 child: CustomElevatedButton(
-                                  onPressedFunction: () {},
+                                  onPressedFunction: () {
+                                    print("apple signin");
+                                    signInWithApple();
+                                  },
                                   width: context.width * 1,
                                   isSocialMediaButton: true,
                                   isAppleLogIn: true,
@@ -135,24 +173,25 @@ class LogInScreen extends StatelessWidget {
                             ],
                           ),
                           20.ph,
+                          100.ph,
+                          const Text(
+                            "Don’t have an account?",
+                            style: CustomTextStyles.black513,
+                          ),
+                          10.ph,
+                          InkWell(
+                            onTap: () {
+                              print("sign up");
+                            },
+                            child: const Text(
+                              "Signup here",
+                              style: CustomTextStyles.blue713,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  const Text(
-                    "Don’t have an account?",
-                    style: CustomTextStyles.black513,
-                  ),
-                  10.ph,
-                  InkWell(
-                    onTap: () {},
-                    child: const Text(
-                      "Signup here",
-                      style: CustomTextStyles.blue713,
-                    ),
-                  ),
-                  10.ph,
                 ],
               ),
             ),
@@ -161,4 +200,33 @@ class LogInScreen extends StatelessWidget {
       ),
     );
   }
+
+  signInWithGoogle() async{
+    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+
+    Get.off(
+          () => const StocksLandingScreen(),
+      transition: Transition.fadeIn,
+    );
+  }
+
+  signInWithApple() async{
+    final appleProvider = AppleAuthProvider();
+    await FirebaseAuth.instance.signInWithProvider(appleProvider);
+    Get.off(
+          () => const StocksLandingScreen(),
+      transition: Transition.fadeIn,
+    );
+  }
 }
+
+

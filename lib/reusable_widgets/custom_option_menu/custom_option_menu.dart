@@ -31,7 +31,9 @@ class StockAnalysisAndMenuMoreOption extends StatelessWidget {
       itemBuilder: (context) => [
         PopupMenuItem<int>(
           value: 0,
-          onTap: () {},
+          onTap: () {
+            print("more");
+          },
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [],

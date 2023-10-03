@@ -55,7 +55,7 @@ class StocksLandingWidget extends StatelessWidget {
                       children: [
                         Text(
                           stocksModel.companyName,
-                          style: CustomTextStyles.black613,
+                          style: CustomTextStyles.black716,
                         ),
                         5.pw,
                         CorporationContainer(
@@ -232,7 +232,7 @@ class StocksLandingWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                   onTap: () {
                     Get.to(
-                      () => StockDetailScreen(stocksModel: stocksModel),
+                      () => StockDetailScreen(stocksModel),
                       transition: Transition.fadeIn,
                     );
                   },
