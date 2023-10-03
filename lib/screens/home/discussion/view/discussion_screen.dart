@@ -25,12 +25,11 @@ class DiscussionScreen extends StatefulWidget {
 
 class _DiscussionScreen extends State<DiscussionScreen> {
 
-  Future<void> fetchChord() async {
+  /*Future<void> fetchChord() async {
     await http.get(Uri.parse('https://tonyintroduction.jackwagner7.repl.co/add/1/2'));
   }
 
-
-
+*/
   loadPosts() async{
     await ConstantLists.getDiscussions();
   }
@@ -61,6 +60,7 @@ class _DiscussionScreen extends State<DiscussionScreen> {
       },
     );
 
+    //Make sure that when the page is loaded, the get posts function will be called, and when the posts are got, refresh the page so the show up
     if (!ConstantLists.loaded){
       setState(() {
         loadPosts();
@@ -75,7 +75,6 @@ class _DiscussionScreen extends State<DiscussionScreen> {
         onPressed: () {
           print("post");
           //fetchChord();
-
           Get.off(
                 () => const PostSharing(title: "Discuss"),
             transition: Transition.cupertino,
@@ -103,9 +102,12 @@ class _DiscussionScreen extends State<DiscussionScreen> {
           child: LiquidPullToRefresh(
             onRefresh: () async {
               setState(()  {
-                ConstantLists.getDiscussions();
+
+                //Refresh function to be implemented
+
+                /*ConstantLists.getDiscussions();
                 listData = ConstantLists.discussionModelList;
-                print(listData);
+                print(listData);*/
                 //ConstantLists.discussionModelList.add(DiscussionModel(documentID: "13", discussionPostedByImage: "https://firebasestorage.googleapis.com/v0/b/forestox-ee2a6.appspot.com/o/Jpeg-file.jpg?alt=media&token=9e3e926a-cc35-46e5-8b39-89bb4124778e", discussionPostedByName: "s", postedTimeAgo: 's', postDescription: '"Welcome to Discussions!"', postImage: "https://firebasestorage.googleapis.com/v0/b/forestox-ee2a6.appspot.com/o/Jpeg-file.jpg?alt=media&token=9e3e926a-cc35-46e5-8b39-89bb4124778e", noOfLikes: 1, noOfComments: 1, numbersOfShares: 1));
               });
             },
